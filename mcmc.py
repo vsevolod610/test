@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """"
-set of T0_i temperature --> Estimate T0
-
-require:    ../Result/Result.txt
+MCMC
 """
 
 import numpy as np
