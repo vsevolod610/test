@@ -11,8 +11,8 @@ from chainconsumer import ChainConsumer
 
 
 params_names = ['a', 'b', 'c']
-params_try = [5, 2, 1] # need in pos
-params_sigma = [2, 1, 0.1] # need in pos
+params_try = np.array([5, 2, 1]) # need in pos
+params_sigma = np.array([2, 1, 0.1]) # need in pos
 ndim = len(params_names)
 
 def model(a, b, c, x):
@@ -25,6 +25,9 @@ x = np.linspace(0, 10, N)
 y = model(*params_true, x) + np.random.normal(0, 2, N)
 yerr = np.abs(np.random.normal(2, 0.5, (N, 2)))
 
+prior_data = dict()
+prior_data['box'] = {'a': [1, 8]}
+prior_data['gauss'] = {'b': [2, 0.1, 0.1]}
 
 
 #____________________________________mcmc_________________________________
@@ -34,39 +37,78 @@ def log_prior_box(v, vleft, vright):
         return 0.0
     return -np.inf
 
+
 def log_prior_gauss(v, mean, sigma_p, sigma_m):
     sigma = sigma_p if (v - mean) else sigma_m
     return - 0.5 * (v - mean) ** 2 / sigma ** 2
 
-def log_probability(params, x, y, yerr, prior=lambda v: 0):
-    if not np.isfinite(prior(params)):
-        return -np.inf
+
+def prior(params, prior_data):
+    a, b, c = params
+    prior_value = 0
+
+    left, right = prior_data['box']['a']
+    prior_value += log_prior_box(a, left, right)
+
+    mu, sigmap, sigmam = prior_data['gauss']['b']
+    prior_value += log_prior_gauss(b, mu, sigmap, sigmam)
+
+    return prior_value 
+
+
+def log_probability(params, x, y, yerr=0, prior_data=0):
+    if not prior_data:
+        prior_value = 0
+    else:
+        prior_value = prior(params)
+        if not np.isfinite(prior_value):
+            return -np.inf
+
     m = model(*params, x)
+
+    N = len(y)
+    if np.shape(yerr) == ():
+        sigma2 == np.ones(N)
     if np.shape(yerr) == (N,):
         sigma2 = yerr ** 2
     if np.shape(yerr) == (N, 2):
-        sigma2 =  np.array([(yerr[i, 1] if m[i] > yi else yerr[i, 0]) for i, yi in enumerate(y)]) ** 2
-    return - 0.5 * np.sum([(yi - m[i]) ** 2 / sigma2[i] for i, yi in enumerate(y)]) + prior(params)
+        sigma2 = np.zeros(N)
+        for i in range(N):
+            sigma2[i] = (yerr[i,1] if m[i] > y[i] else yerr[i, 0]) ** 2
+
+    lp_value = -0.5 * np.sum([(y[i] - m[i]) ** 2 / sigma2[i] for i in range(N)])
+    lp_value += prior_value
+    return lp_value
+
 
 # setting of mcmc
 nwalkers = 100
 nsteps = 200
 amputete = int(0.5 * nsteps)
+
 pos = params_try + params_sigma * np.random.randn(nwalkers, ndim)
 
-def prior(params):
-    a, b, c = params
-    return log_prior_box(a, 1, 8) + log_prior_gauss(b, 2, 0.1, 0.1)
+# check init posintion in prior-box
+for k, param in enumerate(pos):
+    p = param
+    while not np.isfinite(prior(p, prior_data)):
+        p = params_try + params_sigma * np.random.rand(ndim)
+    pos[k] = p
 
 # mcmc mechanism
 with Pool() as pool:
-    sampler = emcee.EnsembleSampler( nwalkers, ndim, log_probability, args=(x, y, yerr), pool=pool)
+    sampler = emcee.EnsembleSampler(nwalkers, ndim,
+                log_probability, args=(x, y, yerr), pool=pool)
     sampler.run_mcmc(pos, nsteps, progress=True)
+
 flat_sample = sampler.chain[:, amputete : , :].reshape((-1, ndim))
 c = ChainConsumer()
 c.add_chain(flat_sample, parameters=params_names)
+
 summary = c.analysis.get_summary(parameters=params_names)
-print(summary)
+print("\nMCMC results:")
+print(*[" {:>4}: {}".format(k, summary[k]) for k in summary.keys()], sep='\n')
+
 
 #____________________________________pic__________________________________
 
@@ -89,3 +131,5 @@ for w in sample_last:
 ax.errorbar(x, y, np.transpose(yerr), capsize=3.5, mew=1.5, fmt='.k', alpha=0.5)
 params_fit = [summary[p][1] for p in params_names]
 ax.plot(x, model(*params_fit, x), 'r')
+
+plt.show()
