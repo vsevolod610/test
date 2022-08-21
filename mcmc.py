@@ -85,7 +85,10 @@ def mcmc_kern(model, nwalkers, nsteps, ndim, init, x, y, yerr=0, prior_data=0):
 
 # Pic's
 
-def pic_chain(sampler):
+def pic_chain(sampler, params_names):
+    samples = sampler.get_chain()
+    ndim = len(samples[0,0,:])
+
     fig, ax = plt.subplots(nrows=ndim, figsize=(10, 7), sharex=True)
     samples = sampler.get_chain()
 
@@ -162,7 +165,7 @@ if __name__ == "__main__":
     print(*[" {:>4}: {}".format(k, summary[k]) for k in summary.keys()], sep='\n')
 
     # Pics
-    fig = pic_chain(sampler)
+    fig = pic_chain(sampler, params_names)
     fig = c.plotter.plot(display=False, legend=False, figsize=(6, 6))
     fig = pic_fit(sampler, model, x, y, yerr, prior_data)
 
