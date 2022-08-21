@@ -39,7 +39,7 @@ def prior(params, prior_data):
     return prior_value 
 
 
-def log_probability(params, x, y, yerr=0, prior_data=0):
+def log_probability(params, model, x, y, yerr=0, prior_data=0):
     if not prior_data:
         prior_value = 0
     else:
@@ -64,7 +64,7 @@ def log_probability(params, x, y, yerr=0, prior_data=0):
     return lp_value
 
 
-def mcmc_kern(nwalkers, nsteps, ndim, init, x, y, yerr=0, prior_data=0):
+def mcmc_kern(model, nwalkers, nsteps, ndim, init, x, y, yerr=0, prior_data=0):
     pos = init[:, 0] + init[:, 1] * np.random.randn(nwalkers, ndim)
 
     # check init posintion in prior-box
@@ -77,7 +77,7 @@ def mcmc_kern(nwalkers, nsteps, ndim, init, x, y, yerr=0, prior_data=0):
     # mcmc mechanism
     with Pool() as pool:
         sampler = emcee.EnsembleSampler(nwalkers, ndim,
-                    log_probability, args=(x, y, yerr, prior_data), pool=pool)
+                    log_probability, args=(model, x, y, yerr, prior_data), pool=pool)
         sampler.run_mcmc(pos, nsteps, progress=True)
 
     return sampler
@@ -97,12 +97,12 @@ def pic_chain(sampler):
     return fig
 
 
-def pic_fit(sampler, x, y, yerr, prior_data):
+def pic_fit(sampler, model, x, y, yerr, prior_data):
     fig, ax = plt.subplots(figsize=(8, 8))
     samples = sampler.get_chain()
     sample_last = samples[-1, :, :]
     params_chi = max(sample_last,
-            key=lambda s: log_probability(s, x, y, yerr, prior_data))
+            key=lambda s: log_probability(s, model, x, y, yerr, prior_data))
 
     for w in sample_last:
         ax.plot(x, model(*w, x), 'b', alpha=0.09)
@@ -119,9 +119,12 @@ def pic_fit(sampler, x, y, yerr, prior_data):
     return fig
 
 
+def model(a, b, c, x0, x):
+    return a * np.sin(c * (x - x0)) + b
+
 if __name__ == "__main__":
     # model
-    model = lambda a, b, c, x0, x: a * np.sin(c * (x - x0)) + b
+    #model = lambda a, b, c, x0, x: a * np.sin(c * (x - x0)) + b
 
     # data
     params_true = [5, 2, 1, 0]
@@ -148,7 +151,7 @@ if __name__ == "__main__":
     amputete = int(0.5 * nsteps)
 
     # mcmc
-    sampler = mcmc_kern(nwalkers, nsteps, ndim, init, x, y, yerr, prior_data)
+    sampler = mcmc_kern(model, nwalkers, nsteps, ndim, init, x, y, yerr, prior_data)
 
     flat_sample = sampler.chain[:, amputete : , :].reshape((-1, ndim))
     c = ChainConsumer()
@@ -161,6 +164,7 @@ if __name__ == "__main__":
     # Pics
     fig = pic_chain(sampler)
     fig = c.plotter.plot(display=False, legend=False, figsize=(6, 6))
-    fig = pic_fit(sampler, x, y, yerr, prior_data)
+    fig = pic_fit(sampler, model, x, y, yerr, prior_data)
 
     plt.show()
+
