@@ -10,23 +10,24 @@ from multiprocessing import Pool
 from chainconsumer import ChainConsumer
 
 
-params_names = ['a', 'b', 'c']
-params_try = np.array([5, 2, 1]) # need in pos
-params_sigma = np.array([2, 1, 0.1]) # need in pos
+params_names = ['a', 'b', 'c', 'x0']
+params_try = np.array([5, 2, 1, 0]) # need in pos
+params_sigma = np.array([2, 3, 0.1, 0.1]) # need in pos
 ndim = len(params_names)
 
-def model(a, b, c, x):
-    return a * np.sin(c * x) + b
+def model(a, b, c, x0, x):
+    return a * np.sin(c * (x - x0)) + b
 
 # data
-params_true = [5, 2, 1]
+params_true = [5, 2, 1, 0]
 N = 100
 x = np.linspace(0, 10, N)
 y = model(*params_true, x) + np.random.normal(0, 2, N)
 yerr = np.abs(np.random.normal(2, 0.5, (N, 2)))
 
 prior_data = dict()
-prior_data['box'] = {'a': [1, 8]}
+prior_data['box'] = {'a': [2, 8],
+                     'b': [1, 4]}
 prior_data['gauss'] = {'b': [2, 0.1, 0.1]}
 
 
@@ -44,23 +45,25 @@ def log_prior_gauss(v, mean, sigma_p, sigma_m):
 
 
 def prior(params, prior_data):
-    a, b, c = params
+    a, b, c, x0 = params
     prior_value = 0
 
     left, right = prior_data['box']['a']
     prior_value += log_prior_box(a, left, right)
+
+    left, right = prior_data['box']['b']
+    prior_value += log_prior_box(b, left, right)
 
     mu, sigmap, sigmam = prior_data['gauss']['b']
     prior_value += log_prior_gauss(b, mu, sigmap, sigmam)
 
     return prior_value 
 
-
 def log_probability(params, x, y, yerr=0, prior_data=0):
     if not prior_data:
         prior_value = 0
     else:
-        prior_value = prior(params)
+        prior_value = prior(params, prior_data)
         if not np.isfinite(prior_value):
             return -np.inf
 
@@ -98,7 +101,7 @@ for k, param in enumerate(pos):
 # mcmc mechanism
 with Pool() as pool:
     sampler = emcee.EnsembleSampler(nwalkers, ndim,
-                log_probability, args=(x, y, yerr), pool=pool)
+                log_probability, args=(x, y, yerr, prior_data), pool=pool)
     sampler.run_mcmc(pos, nsteps, progress=True)
 
 flat_sample = sampler.chain[:, amputete : , :].reshape((-1, ndim))
