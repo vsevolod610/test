@@ -27,14 +27,13 @@ def prior(params, prior_data):
     a, b, c, x0 = params
     prior_value = 0
 
-    left, right = prior_data['box']['a']
-    prior_value += log_prior_box(a, left, right)
+    for p_k in list(prior_data['box']):
+        left, right = prior_data['box'][p_k]
+        prior_value += log_prior_box(params[p_k], left, right)
 
-    left, right = prior_data['box']['b']
-    prior_value += log_prior_box(b, left, right)
-
-    mu, sigmap, sigmam = prior_data['gauss']['b']
-    prior_value += log_prior_gauss(b, mu, sigmap, sigmam)
+    for p_k in list(prior_data['gauss']):
+        mu, sigmap, sigmam = prior_data['gauss'][p_k]
+        prior_value += log_prior_gauss(params[p_k], mu, sigmap, sigmam)
 
     return prior_value 
 
@@ -69,10 +68,9 @@ def mcmc_kern(model, nwalkers, nsteps, ndim, init, x, y, yerr=0, prior_data=0):
 
     # check init posintion in prior-box
     for k, param in enumerate(pos):
-        p = param
-        while not np.isfinite(prior(p, prior_data)):
-            p = params_try + params_sigma * np.random.rand(ndim)
-        pos[k] = p
+        while not np.isfinite(prior(param, prior_data)):
+            param = params_try + params_sigma * np.random.rand(ndim)
+        pos[k] = param
 
     # mcmc mechanism
     with Pool() as pool:
@@ -122,12 +120,14 @@ def pic_fit(sampler, model, x, y, yerr, prior_data):
     return fig
 
 
-def model(a, b, c, x0, x):
+def example_model(a, b, c, x0, x):
     return a * np.sin(c * (x - x0)) + b
+
 
 if __name__ == "__main__":
     # model
-    #model = lambda a, b, c, x0, x: a * np.sin(c * (x - x0)) + b
+    params_names = ['a', 'b', 'c', 'x0']
+    model = example_model
 
     # data
     params_true = [5, 2, 1, 0]
@@ -137,12 +137,11 @@ if __name__ == "__main__":
     yerr = np.abs(np.random.normal(2, 0.5, (N, 2)))
 
     prior_data = dict()
-    prior_data['box'] = {'a': [2, 8],
-                         'b': [1, 4]}
-    prior_data['gauss'] = {'b': [2, 0.1, 0.1]}
+    prior_data['box'] = {params_names.index('a'): [2, 8],
+                         params_names.index('b'): [1, 4]}
+    prior_data['gauss'] = {params_names.index('b'): [2, 0.1, 0.1]}
 
     # settings
-    params_names = ['a', 'b', 'c', 'x0']
     ndim = len(params_names)
 
     params_try = np.array([5, 2, 1, 0])
