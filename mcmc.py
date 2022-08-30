@@ -24,7 +24,6 @@ def log_prior_gauss(v, mean, sigma_p, sigma_m):
 def prior(params, prior_data):
     if not prior_data:
         return 0
-    a, b, c, x0 = params
     prior_value = 0
 
     for p_k in list(prior_data['box']):
@@ -46,7 +45,12 @@ def log_probability(params, model, x, y, yerr=0, prior_data=0):
         if not np.isfinite(prior_value):
             return -np.inf
 
-    m = model(*params, x)
+    const = []
+    if type(prior_data) == dict:
+        if 'const' in prior_data:
+            const = list(prior_data['const'].values())
+
+    m = model(*params, *const, x)
 
     N = len(y)
     if np.shape(yerr) == ():
@@ -105,8 +109,13 @@ def pic_fit(sampler, model, x, y, yerr, prior_data):
     params_chi = max(sample_last,
             key=lambda s: log_probability(s, model, x, y, yerr, prior_data))
 
+    const = []
+    if type(prior_data) == dict:
+        if 'const' in prior_data:
+            const = list(prior_data['const'].values())
+
     for w in sample_last:
-        ax.plot(x, model(*w, x), 'b', alpha=0.09)
+        ax.plot(x, model(*w, *const, x), 'b', alpha=0.09)
 
     if np.shape(yerr) == ():
         ax.plot(x, y, '.k', alpha=0.5, label='data')
@@ -114,32 +123,35 @@ def pic_fit(sampler, model, x, y, yerr, prior_data):
         ax.errorbar(x, y, yerr.T, label='data',
                 capsize=3.5, mew=1.5, fmt='.k', alpha=0.5)
 
-    ax.plot(x, model(*params_chi, x), 'r', label='best fit')
+    ax.plot(x, model(*params_chi, *const, x), 'r', label='best fit')
 
     ax.legend(frameon=False)
     return fig
 
 
-def example_model(a, b, c, x0, x):
-    return a * np.sin(c * (x - x0)) + b
+def example_model(a, b, c, x0, z, x):
+    return a * np.sin(c * (x - x0)) + b - z
 
 
 if __name__ == "__main__":
     # model
     params_names = ['a', 'b', 'c', 'x0']
+    const_names = ['z']
     model = example_model
-
-    # data
-    params_true = [5, 2, 1, 0]
-    N = 100
-    x = np.linspace(0, 10, N)
-    y = model(*params_true, x) + np.random.normal(0, 2, N)
-    yerr = np.abs(np.random.normal(2, 0.5, (N, 2)))
 
     prior_data = dict()
     prior_data['box'] = {params_names.index('a'): [2, 8],
                          params_names.index('b'): [1, 4]}
     prior_data['gauss'] = {params_names.index('b'): [2, 0.1, 0.1]}
+    prior_data['const'] = {const_names.index('z'): 0.0}
+    const = list(prior_data['const'].values())
+
+    # data
+    params_true = [5, 2, 1, 0]
+    N = 100
+    x = np.linspace(0, 10, N)
+    y = model(*params_true, *const, x) + np.random.normal(0, 2, N)
+    yerr = np.abs(np.random.normal(2, 0.5, (N, 2)))
 
     # settings
     ndim = len(params_names)
@@ -169,4 +181,3 @@ if __name__ == "__main__":
     fig = pic_fit(sampler, model, x, y, yerr, prior_data)
 
     plt.show()
-
