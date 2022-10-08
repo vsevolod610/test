@@ -66,7 +66,8 @@ def log_probability(params, model, x, y, yerr=0, prior_data=0):
     return lp_value
 
 
-def mcmc_kern(model, nwalkers, nsteps, ndim, init, x, y, yerr=0, prior_data=0):
+def mcmc_kern(model, nwalkers, nsteps, init, x, y, yerr=0, prior_data=0):
+    ndim = len(init)
     pos = init[:, 0] + init[:, 1] * np.random.randn(nwalkers, ndim)
 
     # check init posintion in prior-box

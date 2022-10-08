@@ -47,7 +47,7 @@ if __name__ == "__main__":
 
 
     # mcmc realyze
-    sampler = mcmc_kern(model, nwalkers, nsteps, ndim, init, x, y, yerr, prior_data)
+    sampler = mcmc_kern(model, nwalkers, nsteps, init, x, y, yerr, prior_data)
 
     flat_sample = sampler.chain[:, amputete : , :].reshape((-1, ndim))
     c = ChainConsumer()
