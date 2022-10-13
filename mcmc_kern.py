@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 MCMC kern
+problems:
+    - не приспособлен для анализа с одним параметром
 """
 
 import numpy as np
@@ -11,8 +13,8 @@ from multiprocessing import Pool
 
 # MCMC
 
-def prior_func(params, prior_data):
-    if not prior_data:
+def prior_func(params, prior_data=None):
+    if prior_data is None:
         return 0
     prior_value = 0
 
@@ -31,10 +33,10 @@ def prior_func(params, prior_data):
     return prior_value 
 
 
-def log_probability(params, model, x, y, yerr=0, prior_data=0):
+def log_probability(params, model, x, y, yerr=None, prior_data=None):
 
     # priors
-    if not prior_data:
+    if prior_data is None:
         prior_value = 0
     else:
         prior_value = prior_func(params, prior_data)
@@ -66,7 +68,7 @@ def log_probability(params, model, x, y, yerr=0, prior_data=0):
     return lp_value
 
 
-def mcmc_kern(model, nwalkers, nsteps, init, x, y, yerr=0, prior_data=0):
+def mcmc_kern(model, nwalkers, nsteps, init, x, y, yerr=None, prior_data=None):
     ndim = len(init)
     pos = init[:, 0] + init[:, 1] * np.random.randn(nwalkers, ndim)
 
@@ -87,9 +89,11 @@ def mcmc_kern(model, nwalkers, nsteps, init, x, y, yerr=0, prior_data=0):
 
 # Pics
 
-def pic_chain(sampler, params_names):
+def pic_chain(sampler, params_names=None):
     samples = sampler.get_chain()
     ndim = len(samples[0,0,:])
+    if params_names is None:
+        params_names = np.arange(ndim)
 
     fig, ax = plt.subplots(nrows=ndim, figsize=(10, 7), sharex=True)
     samples = sampler.get_chain()
@@ -103,7 +107,7 @@ def pic_chain(sampler, params_names):
     return fig, ax
 
 
-def pic_fit(sampler, model, x, y, yerr, prior_data):
+def pic_fit(sampler, model, x, y, yerr=None, prior_data=None):
     fig, ax = plt.subplots(figsize=(8, 8))
     samples = sampler.get_chain()
     sample_last = samples[-1, :, :]
