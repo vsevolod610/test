@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 MCMC kern
-problems:
-    - не приспособлен для анализа с одним параметром
 """
 
 import numpy as np
@@ -99,11 +97,15 @@ def pic_chain(sampler, params_names=None):
     samples = sampler.get_chain()
 
     # plot(chain)
-    for i, row in enumerate(ax, start=0):
-        row.plot(samples[:, :, i], "k", alpha=0.3)
-        row.set_ylabel(params_names[i], fontsize=12)
-
-    row.set_xlabel(r'steps', fontsize=12)
+    if ndim == 1:
+        ax.plot(samples[:, :, 0], "k", alpha=0.3)
+        ax.set_ylabel(params_names[0], fontsize=12)
+        ax.set_xlabel(r'steps', fontsize=12)
+    else:
+        for i, row in enumerate(ax, start=0):
+            row.plot(samples[:, :, i], "k", alpha=0.3)
+            row.set_ylabel(params_names[i], fontsize=12)
+        row.set_xlabel(r'steps', fontsize=12)
     return fig, ax
 
 
