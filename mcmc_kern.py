@@ -17,16 +17,18 @@ def prior_func(params, prior_data=None):
     prior_value = 0
 
     # box prior
-    for k in list(prior_data['box']):
-        left, right = prior_data['box'][k]
-        if not (left < params[k] < right):
-            prior_value += -np.inf
+    if 'box' in list(prior_data):
+        for k in list(prior_data['box']):
+            left, right = prior_data['box'][k]
+            if not (left < params[k] < right):
+                prior_value += -np.inf
 
     # gauss prior
-    for k in list(prior_data['gauss']):
-        mu, sigma_p, sigma_m = prior_data['gauss'][k]
-        sigma = sigma_p if (params[k] - mu) else sigma_m
-        prior_value += -0.5 * (params[k] - mu)**2 / sigma**2
+    if 'gauss' in list(prior_data):
+        for k in list(prior_data['gauss']):
+            mu, sigma_p, sigma_m = prior_data['gauss'][k]
+            sigma = sigma_p if (params[k] - mu) else sigma_m
+            prior_value += -0.5 * (params[k] - mu)**2 / sigma**2
 
     return prior_value 
 

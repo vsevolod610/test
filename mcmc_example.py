@@ -10,6 +10,9 @@ from chainconsumer import ChainConsumer
 from mcmc_kern import mcmc_kern, pic_chain, pic_fit
 
 
+np.random.seed(123)
+
+
 def example_model(a, b, c, x0, z, x):
     return a * np.sin(c * (x - x0) ** z) + b 
 
