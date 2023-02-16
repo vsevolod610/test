@@ -7,7 +7,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from chainconsumer import ChainConsumer
 
-from mcmc_kern import mcmc_kern, pic_chain, pic_fit
+from mcmc_kern import mcmc_kern
+from mcmc_analyze import pic_chain, pic_fit
 
 
 np.random.seed(123)
@@ -52,9 +53,12 @@ if __name__ == "__main__":
     # mcmc realyze
     sampler = mcmc_kern(model, nwalkers, nsteps, init, x, y, yerr, prior_data)
 
+    # mcmc analyze
     flat_sample = sampler.chain[:, amputete : , :].reshape((-1, ndim))
     c = ChainConsumer()
     c.add_chain(flat_sample, parameters=params_names)
+
+    # symmary
     summary = c.analysis.get_summary(parameters=params_names)
     print("\nMCMC results:")
     print(*[" {:>4}: {}".format(k, summary[k]) for k in summary.keys()], sep='\n')
