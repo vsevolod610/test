@@ -58,12 +58,10 @@ def log_probability(params, model, x, y, yerr=None, prior_data=None):
     if np.shape(yerr) == (N,):
         sigma2 = yerr ** 2
     if np.shape(yerr) == (N, 2):
-        sigma2 = np.zeros(N)
-        for i in range(N):
-            sigma2[i] = (yerr[i,1] if m[i] > y[i] else yerr[i, 0]) ** 2
+        sigma2 = (m <= y) * yerr[:,0] + (m > y) * yerr[:,1]
 
     # lp
-    lp_value = -0.5 * np.sum([(y[i] - m[i])**2 / sigma2[i] for i in range(N)])
+    lp_value = -0.5 * np.sum((y - m) ** 2 / sigma2)
     #lp_value += -0.5 * np.sum(np.log(sigma2))
     lp_value += prior_value
     return lp_value
