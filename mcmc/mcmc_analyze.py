@@ -1,12 +1,41 @@
 # -*- coding: utf-8 -*-
 """
-MCMC kern
+MCMC analysys
+    - добавить отладочные штуки: рисовать chi2
+    - ndim = len(samples[0,0,:]) - так не годится определять ndim
+    - params_names -> parameters
 """
 
 import numpy as np
 import matplotlib.pyplot as plt
 
+from chainconsumer import ChainConsumer
+
 from mcmc_kern import log_probability
+
+
+def mcmc_analyze(sampler, amputate, params_names=None, prnt=False, pic=False):
+    samples = sampler.get_chain()
+    ndim = len(samples[0,0,:])
+
+    # mcmc analyze
+    flat_sample = sampler.chain[:, amputate : , :].reshape((-1, ndim))
+    c = ChainConsumer()
+    c.add_chain(flat_sample, parameters=params_names)
+
+    summary = c.analysis.get_summary(parameters=params_names)
+
+    # print
+    if prnt is True:
+        s = [" {:>4}: {}".format(k, summary[k]) for k in summary.keys()]
+        print("\nMCMC results:", *s, sep='\n')
+
+    # Pics
+    if pic is True:
+        fig = c.plotter.plot(display=False, legend=False, figsize=(6, 6))
+
+    return summary
+
 
 # Pics
 

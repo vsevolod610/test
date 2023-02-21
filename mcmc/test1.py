@@ -9,6 +9,7 @@ from chainconsumer import ChainConsumer
 
 from mcmc_kern import mcmc_kern
 from mcmc_analyze import pic_chain, pic_fit
+from mcmc_analyze import mcmc_analyze
 
 
 np.random.seed(123)
@@ -47,25 +48,12 @@ if __name__ == "__main__":
 
     nwalkers = 100
     nsteps = 200
-    amputete = int(0.5 * nsteps)
+    amputate = int(0.5 * nsteps)
 
-
-    # mcmc realyze
+    # mcmc 
     sampler = mcmc_kern(model, nwalkers, nsteps, init, x, y, yerr, prior_data)
-
-    # mcmc analyze
-    flat_sample = sampler.chain[:, amputete : , :].reshape((-1, ndim))
-    c = ChainConsumer()
-    c.add_chain(flat_sample, parameters=params_names)
-
-    # symmary
-    summary = c.analysis.get_summary(parameters=params_names)
-    print("\nMCMC results:")
-    print(*[" {:>4}: {}".format(k, summary[k]) for k in summary.keys()], sep='\n')
-
-    # Pics
+    mcmc_analyze(sampler, amputate, params_names, prnt=True, pic=True)
     fig, ax = pic_chain(sampler, params_names)
-    fig = c.plotter.plot(display=False, legend=False, figsize=(6, 6))
     fig, ax = pic_fit(sampler, model, x, y, yerr, prior_data)
 
     plt.show()

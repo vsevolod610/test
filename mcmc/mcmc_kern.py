@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 MCMC kern
+    - init -> start_params
 """
 
 import numpy as np
@@ -62,7 +63,8 @@ def log_probability(params, model, x, y, yerr=None, prior_data=None):
             sigma2[i] = (yerr[i,1] if m[i] > y[i] else yerr[i, 0]) ** 2
 
     # lp
-    lp_value = -0.5 * np.sum([(y[i] - m[i]) ** 2 / sigma2[i] for i in range(N)])
+    lp_value = -0.5 * np.sum([(y[i] - m[i])**2 / sigma2[i] for i in range(N)])
+    #lp_value += -0.5 * np.sum(np.log(sigma2))
     lp_value += prior_value
     return lp_value
 
@@ -79,8 +81,9 @@ def mcmc_kern(model, nwalkers, nsteps, init, x, y, yerr=None, prior_data=None):
 
     # mcmc mechanism
     with Pool() as pool:
-        sampler = emcee.EnsembleSampler(nwalkers, ndim,
-                    log_probability, args=(model, x, y, yerr, prior_data), pool=pool)
+        sampler = emcee.EnsembleSampler(nwalkers, ndim, log_probability, 
+                                        args=(model, x, y, yerr, prior_data), 
+                                        pool=pool)
         sampler.run_mcmc(pos, nsteps, progress=True)
 
     return sampler
