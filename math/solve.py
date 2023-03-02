@@ -8,8 +8,7 @@ from scipy.optimize import fsolve
 
 a = 3 / np.pi
 f = lambda x: np.sin(x)/x - a
-
-print(fsolve(f, 2))
+print(*fsolve(f, 2))
 
 
 """
@@ -22,7 +21,7 @@ from scipy.optimize import minimize
 f = lambda x: -1 * x * np.exp(-x)
 x_start = 1
 soln = minimize(f, x_start)
-print(soln.x)
+print(*soln.x)
 
 
 """
@@ -36,4 +35,4 @@ f = lambda x: np.exp(-x ** 2)
 x_start = -np.Inf
 x_stop = np.Inf
 solv = integrate.quad(f, x_start, x_stop)
-print(solv)
+print("{} +- {}".format(*solv))

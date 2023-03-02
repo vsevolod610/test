@@ -25,7 +25,7 @@ if __name__ == "__main__":
     model = iden
 
     # data
-    N = 100
+    N = 300
     mu_true = 0
     sigma = 1
     err_mu, err_sigma = 1.0 , 0.5
@@ -40,8 +40,8 @@ if __name__ == "__main__":
     params_sigma = [1.1]
     init = np.array([params_try, params_sigma]).T
 
-    nwalkers = 100
-    nsteps = 200
+    nwalkers = 200
+    nsteps = 400
     amputate = int(0.3 * nsteps)
 
     # mcmc 

@@ -2,6 +2,8 @@
 """
 MCMC kern
     - init -> start_params
+    - исключения
+    - amputate = 0.5 * steps -> 0.5 (<1), 100 (>1) ?
 """
 
 import numpy as np
