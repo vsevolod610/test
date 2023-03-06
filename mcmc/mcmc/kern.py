@@ -3,7 +3,6 @@
 MCMC kern
     - init -> start_params
     - исключения
-    - amputate = 0.5 * steps -> 0.5 (<1), 100 (>1) ?
 """
 
 import numpy as np
@@ -19,15 +18,15 @@ def prior_func(params, prior_data=None):
     prior_value = 0
 
     # box prior
-    if 'box' in list(prior_data):
-        for k in list(prior_data['box']):
+    if 'box' in prior_data:
+        for k in prior_data['box']:
             left, right = prior_data['box'][k]
             if not (left < params[k] < right):
                 prior_value += -np.inf
 
     # gauss prior
-    if 'gauss' in list(prior_data):
-        for k in list(prior_data['gauss']):
+    if 'gauss' in prior_data:
+        for k in prior_data['gauss']:
             mu, sigma_p, sigma_m = prior_data['gauss'][k]
             sigma = sigma_p if (params[k] - mu) else sigma_m
             prior_value += -0.5 * (params[k] - mu)**2 / sigma**2

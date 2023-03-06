@@ -4,8 +4,10 @@ MCMC analysys
     - добавить отладочные штуки: рисовать chi2
     - ndim = len(samples[0,0,:]) - так не годится определять ndim
     - params_names -> parameters
+    - amputate = 0.5 * steps -> 0.5 (<1), 100 (>1) ?
 """
 
+import gc
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -14,28 +16,58 @@ from chainconsumer import ChainConsumer
 from mcmc.kern import log_probability
 
 
-def mcmc_analyze(sampler, amputate, params_names=None, prnt=False, pic=False):
+def mcmc_analyze(sampler, amputate, params_names=None):
     samples = sampler.get_chain()
     ndim = len(samples[0,0,:])
 
-    # mcmc analyze
     flat_sample = sampler.chain[:, amputate : , :].reshape((-1, ndim))
     c = ChainConsumer()
     c.add_chain(flat_sample, parameters=params_names)
 
-    summary = c.analysis.get_summary(parameters=params_names)
+    return c
+
+def mcmc_summary(c, prnt=False):
+    summary = c.analysis.get_summary()
 
     # print
     if prnt is True:
         s = [" {:>4}: {}".format(k, summary[k]) for k in summary.keys()]
         print("\nMCMC results:", *s, sep='\n')
 
-    # Pics
-    if pic is True:
-        fig = c.plotter.plot(display=False, legend=False, figsize=(6, 6))
-
     return summary
 
+
+paths_default = ['mcmc_walkers.png', 'mcmc_dist.png', 'mcmc_plot.png']
+
+def mcmc_pics(sampler, c, model, data, prior_data=None, params_names=None,
+              mode='show', paths=paths_default):
+
+    x, y, *yerr = data
+    if yerr == []: yerr = None
+    else: yerr = yerr[0]
+
+    fig0 = c.plotter.plot(display=False, legend=False, figsize=(6, 6))
+    fig1, ax1 = pic_chain(sampler, params_names)
+    fig2, ax2 = pic_fit(sampler, model, x, y, yerr, prior_data)
+
+    if mode == 'show':
+        plt.show()
+    if mode == 'save':
+        fig0.savefig(paths[0])
+        fig1.savefig(paths[1])
+        fig2.savefig(paths[2])
+
+        # garved collector
+        plt.clf()
+        plt.close()
+        plt.close(fig0)
+        plt.close(fig1)
+        plt.close(fig2)
+        plt.close('all')
+        del fig0
+        del fig1
+        del fig2
+        gc.collect()
 
 # Pics
 
