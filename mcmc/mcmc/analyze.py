@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 from chainconsumer import ChainConsumer
 
-from mcmc_kern import log_probability
+from mcmc.kern import log_probability
 
 
 def mcmc_analyze(sampler, amputate, params_names=None, prnt=False, pic=False):

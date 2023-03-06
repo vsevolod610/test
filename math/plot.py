@@ -25,5 +25,6 @@ ax.set_ylim(-2, 2)
 #ax.set_xlabel(r"x")
 #ax.set_ylabel(r"y")
 #ax.legend(frameon=False)
+#ax.set_yscale('log')
 
 plt.show()
