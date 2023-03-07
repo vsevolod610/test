@@ -18,6 +18,7 @@ ax.plot(x, f(x))
 #axes
 ax.plot(x, 0*x, 'k')
 ax.plot(0*x, x, 'k')
+ax.axvline(x=2, color='r')
 
 ax.set_xlim(-5, 5)
 ax.set_ylim(-2, 2)

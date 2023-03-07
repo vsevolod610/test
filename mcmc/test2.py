@@ -60,5 +60,5 @@ sampler = mcmc_kern(model, nwalkers, nsteps, init, x, y, yerr)
 consumer = mcmc_analyze(sampler, amputate)
 summary = mcmc_summary(consumer, prnt=True)
 data = x, y, yerr
-mcmc_pics(sampler, consumer, model, data, mode='show')
+mcmc_pics(sampler, consumer, model, data, amputate=amputate, mode='show')
 

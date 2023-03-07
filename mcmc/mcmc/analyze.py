@@ -39,15 +39,17 @@ def mcmc_summary(c, prnt=False):
 
 paths_default = ['mcmc_walkers.png', 'mcmc_dist.png', 'mcmc_plot.png']
 
-def mcmc_pics(sampler, c, model, data, prior_data=None, params_names=None,
-              mode='show', paths=paths_default):
+def mcmc_pics(sampler, c, model, data, amputate=None, prior_data=None, 
+              params_names=None, mode='show', paths=paths_default):
 
     x, y, *yerr = data
     if yerr == []: yerr = None
     else: yerr = yerr[0]
 
     fig0 = c.plotter.plot(display=False, legend=False, figsize=(6, 6))
-    fig1, ax1 = pic_chain(sampler, params_names)
+    #fig1 = c.plotter.plot_walks(display=False, convolve=100, figsize=(6, 6))
+    fig1, ax1 = pic_chain(sampler, amputate=amputate, 
+                          params_names=params_names)
     fig2, ax2 = pic_fit(sampler, model, x, y, yerr, prior_data)
 
     if mode == 'show':
@@ -71,7 +73,7 @@ def mcmc_pics(sampler, c, model, data, prior_data=None, params_names=None,
 
 # Pics
 
-def pic_chain(sampler, params_names=None):
+def pic_chain(sampler, amputate=None, params_names=None):
     samples = sampler.get_chain()
     ndim = len(samples[0,0,:])
     if params_names is None:
@@ -83,11 +85,15 @@ def pic_chain(sampler, params_names=None):
     # plot(chain)
     if ndim == 1:
         ax.plot(samples[:, :, 0], "k", alpha=0.3)
+        if amputate:
+            ax.axvline(x=amputate, color='r')
         ax.set_ylabel(params_names[0], fontsize=12)
         ax.set_xlabel(r'steps', fontsize=12)
     else:
         for i, row in enumerate(ax, start=0):
             row.plot(samples[:, :, i], "k", alpha=0.3)
+            if amputate:
+                row.axvline(x=amputate, color='r')
             row.set_ylabel(params_names[i], fontsize=12)
         row.set_xlabel(r'steps', fontsize=12)
     return fig, ax
