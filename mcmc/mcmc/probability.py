@@ -1,20 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-MCMC kern
-    - init -> start_params
-    - исключения
+MCMC ...
 """
 
 import numpy as np
-import emcee
-from multiprocessing import Pool
 
 
-# MCMC
-
-def prior_func(params, prior_data=None):
-    if prior_data is None:
-        return 0
+def prior_func(params, prior_data):
     prior_value = 0
 
     # box prior
@@ -22,7 +14,7 @@ def prior_func(params, prior_data=None):
         for k in prior_data['box']:
             left, right = prior_data['box'][k]
             if not (left < params[k] < right):
-                prior_value += -np.inf
+                return -np.inf
 
     # gauss prior
     if 'gauss' in prior_data:
@@ -66,24 +58,4 @@ def log_probability(params, model, x, y, yerr=None, prior_data=None):
     #lp_value += -0.5 * np.sum(np.log(sigma2))
     lp_value += prior_value
     return lp_value
-
-
-def mcmc_kern(model, nwalkers, nsteps, init, x, y, yerr=None, prior_data=None):
-    ndim = len(init)
-    pos = init[:, 0] + init[:, 1] * np.random.randn(nwalkers, ndim)
-
-    # check init posintion in prior-box
-    for k, param in enumerate(pos):
-        while not np.isfinite(prior_func(param, prior_data)):
-            param = init[:, 0] + init[:, 1] * np.random.rand(ndim)
-        pos[k] = param
-
-    # mcmc mechanism
-    with Pool() as pool:
-        sampler = emcee.EnsembleSampler(nwalkers, ndim, log_probability, 
-                                        args=(model, x, y, yerr, prior_data), 
-                                        pool=pool)
-        sampler.run_mcmc(pos, nsteps, progress=True)
-
-    return sampler
 

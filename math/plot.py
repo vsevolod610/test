@@ -3,6 +3,7 @@
 Pic: 
 """
 
+import gc
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -28,4 +29,10 @@ ax.set_ylim(-2, 2)
 #ax.legend(frameon=False)
 #ax.set_yscale('log')
 
+#fig.savefig('pic.pdf', format='pdf', bbox_inches='tight')
+
 plt.show()
+
+# garved collector
+plt.close()
+gc.collect()

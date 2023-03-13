@@ -7,8 +7,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from chainconsumer import ChainConsumer
 
-from mcmc.kern import mcmc_kern, log_probability
-from mcmc.analyze import mcmc_analyze, mcmc_summary, mcmc_pics
+from mcmc.analyze import mcmc
+from mcmc.probability import log_probability
 
 
 np.random.seed(123)
@@ -56,9 +56,5 @@ ax.plot(line, chi2)
 plt.show()
 
 # mcmc 
-sampler = mcmc_kern(model, nwalkers, nsteps, init, x, y, yerr)
-consumer = mcmc_analyze(sampler, amputate)
-summary = mcmc_summary(consumer, prnt=True)
-data = x, y, yerr
-mcmc_pics(sampler, consumer, model, data, amputate=amputate, mode='show')
-
+mcmc(data=(x, y, yerr), model_params=(model, init, {}), 
+     settings=(nwalkers, nsteps, amputate), prnt=True, show=True, save=False)
