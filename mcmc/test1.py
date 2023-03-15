@@ -7,7 +7,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from chainconsumer import ChainConsumer
 
-from mcmc.analyze import mcmc
+#from mcmc.analyze import mcmc
+from mcmc import mcmc
 
 np.random.seed(123)
 

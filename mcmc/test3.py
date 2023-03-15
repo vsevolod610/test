@@ -7,8 +7,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from chainconsumer import ChainConsumer
 
-from mcmc.analyze import mcmc
-from mcmc.probability import log_probability
+from mcmc import mcmc, log_probability
+
 
 np.random.seed(123)
 
@@ -36,8 +36,8 @@ params_try = [0.9, 1.2]
 params_sigma = [0.5, 1]
 init = np.array([params_try, params_sigma]).T
 
-nwalkers = 100
-nsteps = 200
+nwalkers = 300
+nsteps = 600
 amputate = int(0.3 * nsteps)
 
 # chi2

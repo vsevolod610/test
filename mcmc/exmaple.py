@@ -34,7 +34,9 @@ print(flat_samples.shape)
 
 ###
 what = sampler.chain
+chain = sampler.get_chain()
 print(type(what), what.shape, what[-1, -1])
+print(type(chain), chain.shape, chain[-1, -1])
 print(type(flat_samples), flat_samples.shape, flat_samples[-1])
 
 #### ChainConsum

@@ -7,8 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from chainconsumer import ChainConsumer
 
-from mcmc.analyze import mcmc
-from mcmc.probability import log_probability
+from mcmc import mcmc, log_probability
 
 
 np.random.seed(123)
