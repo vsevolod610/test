@@ -28,6 +28,7 @@ def mcmc_run(data, model, nwalkers, nsteps, init, prior_data=None):
                                         pool=pool)
         sampler.run_mcmc(pos, nsteps, progress=True)
 
+    chain = sampler.get_chain()
 
-    return sampler
+    return chain
 

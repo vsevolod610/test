@@ -17,16 +17,17 @@ def mcmc(data, model_params, settings, **kwargs):
     model, init, prior_data, params_names, *_ = *model_params, None, None
     nwalkers, nsteps, amputate = settings
 
-    sampler = mcmc_run(data, model, nwalkers, nsteps, init, 
+    chain = mcmc_run(data, model, nwalkers, nsteps, init, 
                        prior_data=prior_data)
-    summary = mcmc_analyze(sampler, data, model_params, amputate, **kwargs)
+    summary = mcmc_analyze(chain, data, model_params, amputate, **kwargs)
 
     return summary
 
-def mcmc_analyze(sampler, data, model_params, amputate, **kwargs):
+def mcmc_analyze(chain, data, model_params, amputate, **kwargs):
     # args
     x, y, yerr, *_ = *data, None
     model, init, prior_data, params_names, *_ = *model_params, None, None
+    ndim = len(init) 
 
     show = False
     save = False
@@ -34,15 +35,9 @@ def mcmc_analyze(sampler, data, model_params, amputate, **kwargs):
     if 'show' in kwargs: show = kwargs['show']
     if 'save' in kwargs: save = kwargs['save']
 
-    ndim = len(init) 
-
-    samples = sampler.get_chain()
-    flat_sample = sampler.chain[:, amputate : , :].reshape((-1, ndim))
-    #flat_sample = sampler.get_chain(discard=amputate, thin=15, flat=True)
-    #print(type(samples), samples.shape())
+    flat_chain = chain[:, amputate : , :].reshape((-1, ndim))
     c = ChainConsumer()
     c.add_chain(flat_sample, parameters=params_names)
-
     summary = c.analysis.get_summary()
 
     # print
@@ -54,8 +49,8 @@ def mcmc_analyze(sampler, data, model_params, amputate, **kwargs):
     #if 'show' in kwargs or 'save' in kwargs:
     if 'save' in kwargs or 'show' in kwargs:
         fig0 = c.plotter.plot(legend=False, figsize=(6, 6))
-        fig1 = pic_chain(samples, amputate=amputate, params_names=params_names)
-        fig2 = pic_fit(samples, model, x, y, yerr, prior_data)
+        fig1 = pic_chain(chain, amputate=amputate, params_names=params_names)
+        fig2 = pic_fit(chain, model, x, y, yerr, prior_data)
 
         #fig1 = c.plotter.plot_walks(convolve=100, figsize=(6, 6))
         if save:
@@ -68,7 +63,6 @@ def mcmc_analyze(sampler, data, model_params, amputate, **kwargs):
             gc.collect()
         if show:
             plt.show()
-
 
     return summary
 

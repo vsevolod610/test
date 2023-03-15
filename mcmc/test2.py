@@ -56,5 +56,5 @@ ax.plot(line, chi2)
 plt.show()
 
 # mcmc 
-mcmc(data=(x, y, yerr), model_params=(model, init, {}), 
+mcmc(data=(x, y, yerr), model_params=(model, init, None, None), 
      settings=(nwalkers, nsteps, amputate), prnt=True, show=True, save=False)

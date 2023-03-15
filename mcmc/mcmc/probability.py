@@ -6,8 +6,9 @@ MCMC ...
 import numpy as np
 
 
-def prior_func(params, prior_data):
+def prior_func(params, prior_data=None):
     prior_value = 0
+    if prior_data is None: return 0
 
     # box prior
     if 'box' in prior_data:

@@ -48,5 +48,5 @@ m = soln.x
 print('MLS: ', *m)
 
 # mcmc 
-mcmc(data=(x, y), model_params=(model, init, {}), 
+mcmc(data=(x, y), model_params=(model, init, None, None), 
      settings=(nwalkers, nsteps, amputate), prnt=True, show=True, save=False)
