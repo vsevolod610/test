@@ -108,7 +108,7 @@ def pic_chain(chain, amputate=None, params_names=None):
             if amputate: row.axvline(x=amputate, color='r')
             row.set_ylabel(params_names[i], fontsize=12)
         row.set_xlabel(r'steps', fontsize=12)
-    return fig, ax
+    return fig
 
 
 def pic_fit(chain, model, x, y, yerr=None, prior_data=None):
@@ -137,7 +137,7 @@ def pic_fit(chain, model, x, y, yerr=None, prior_data=None):
     ax.plot(x, model(*params_chi, *const, x), 'r', label='best fit')
 
     ax.legend(frameon=False)
-    return fig, ax
+    return fig
 
 
 def mcmc_analyze(chain, data, model_params, amputate, **kwargs):

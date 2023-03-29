@@ -18,15 +18,15 @@ ax.plot(x, f(x))
 
 #axes
 ax.plot(x, 0*x, 'k')
-ax.plot(0*x, x, 'k')
+ax.plot(0*x, x, 'k', label='line')
 ax.axvline(x=2, color='r')
 
 ax.set_xlim(-5, 5)
 ax.set_ylim(-2, 2)
 
-#ax.set_xlabel(r"x")
-#ax.set_ylabel(r"y")
-#ax.legend(frameon=False)
+ax.set_xlabel(r"x")
+ax.set_ylabel(r"y")
+ax.legend(frameon=False)
 #ax.set_yscale('log')
 
 #fig.savefig('pic.pdf', format='pdf', bbox_inches='tight')
