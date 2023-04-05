@@ -44,12 +44,12 @@ amputate = int(0.3 * nsteps)
 # chi2
 from scipy.optimize import minimize
 nll = lambda *args: -log_probability(*args)
-soln = minimize(nll, params_try, args=(model, x, y, yerr))
+soln = minimize(nll, params_try, args=(model, (x, y, yerr)))
 m = soln.x
 print('MLS: ', *m)
 fig, ax = plt.subplots(figsize=(8, 8))
 line = np.linspace(-10, 10, 100)
-nll = lambda *args: -log_probability(*args, model, x, y, yerr)
+nll = lambda *args: -log_probability(*args, model, (x, y, yerr))
 chi2 = [nll([mu]) for mu in line]
 ax.plot(line, chi2)
 plt.show()

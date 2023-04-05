@@ -32,7 +32,9 @@ def prior_func(params, prior_data=None):
     return prior_value 
 
 
-def log_probability(params, model, x, y, yerr=None, prior_data=None):
+def log_probability(params, model, data, prior_data=None):
+    # args managemts: data = (x, y, yerr=None)
+    x, y, yerr, *_ = *data, None
 
     # priors
     if prior_data is None:
@@ -66,8 +68,10 @@ def log_probability(params, model, x, y, yerr=None, prior_data=None):
     return lp_value
 
 
-def mcmc_run(data, model, nwalkers, nsteps, init, prior_data=None):
+def mcmc_run(data, model, settings, init, prior_data=None):
+    # args managment
     x, y, yerr, *_ = *data, None 
+    nwalkers, nsteps = settings
     ndim = len(init)
 
     # check init posintion in prior-box
@@ -78,9 +82,10 @@ def mcmc_run(data, model, nwalkers, nsteps, init, prior_data=None):
         pos[k] = param
 
     # mcmc mechanism
-    with Pool() as pool:
+    # processes
+    with Pool(processes=4) as pool:
         sampler = emcee.EnsembleSampler(nwalkers, ndim, log_probability, 
-                                        args=(model, x, y, yerr, prior_data), 
+                                        args=(model, data, prior_data), 
                                         pool=pool)
         sampler.run_mcmc(pos, nsteps, progress=True)
 
@@ -111,10 +116,13 @@ def pic_chain(chain, amputate=None, params_names=None):
     return fig
 
 
-def pic_fit(chain, model, x, y, yerr=None, prior_data=None):
+def pic_fit(chain, model, data, prior_data=None):
+    # args managment
+    x, y, yerr, *_ = *data, None 
+
     fig, ax = plt.subplots(figsize=(8, 8))
     last_step = chain[:, -1, :]
-    func = lambda param: log_probability(param, model, x, y, yerr, prior_data)
+    func = lambda param: log_probability(param, model, data, prior_data)
     params_chi = max(last_step, key=func)
 
     const = []
@@ -140,17 +148,16 @@ def pic_fit(chain, model, x, y, yerr=None, prior_data=None):
     return fig
 
 
-def mcmc_analyze(chain, data, model_params, amputate, **kwargs):
-    # args
+def mcmc_analyze(chain, data, model, init, prior_data, amputate, params_names, 
+                 **kwargs):
+    # args management
     x, y, yerr, *_ = *data, None
-    model, init, prior_data, params_names, *_ = *model_params, None, None
     ndim = len(init) 
 
-    show = False
-    save = False
-    if 'prnt' in kwargs: prnt = kwargs['prnt']
-    if 'show' in kwargs: show = kwargs['show']
-    if 'save' in kwargs: save = kwargs['save']
+    # kwargs
+    prnt = kwargs['prnt'] if 'prnt' in kwargs else False
+    show = kwargs['show'] if 'show' in kwargs else False
+    save = kwargs['save'] if 'save' in kwargs else False
 
     flat_chain = chain[amputate :, : , :].reshape((-1, ndim))
     c = ChainConsumer()
@@ -158,16 +165,15 @@ def mcmc_analyze(chain, data, model_params, amputate, **kwargs):
     summary = c.analysis.get_summary()
 
     # print
-    if prnt == True:
+    if prnt:
         s = [" {:>4}: {}".format(k, summary[k]) for k in summary.keys()]
         print("\nMCMC results:", *s, sep='\n')
 
     # pics
-    #if 'show' in kwargs or 'save' in kwargs:
-    if 'save' in kwargs or 'show' in kwargs:
+    if show or save:
         fig0 = c.plotter.plot(legend=False, figsize=(6, 6))
         fig1 = pic_chain(chain, amputate=amputate, params_names=params_names)
-        fig2 = pic_fit(chain, model, x, y, yerr, prior_data)
+        fig2 = pic_fit(chain, model, data, prior_data)
 
         #fig1 = c.plotter.plot_walks(convolve=100, figsize=(6, 6))
         if save:
@@ -185,14 +191,14 @@ def mcmc_analyze(chain, data, model_params, amputate, **kwargs):
 
 
 def mcmc(data, model_params, settings, **kwargs):
-    # args
+    # args management
     x, y, yerr, *_ = *data, None
     model, init, prior_data, params_names, *_ = *model_params, None, None
     nwalkers, nsteps, amputate = settings
 
-    chain = mcmc_run(data, model, nwalkers, nsteps, init, 
-                       prior_data=prior_data)
-    summary = mcmc_analyze(chain, data, model_params, amputate, **kwargs)
+    chain = mcmc_run(data, model, (nwalkers, nsteps), init, prior_data)
+    summary = mcmc_analyze(chain, data, model, init, prior_data, amputate, 
+                           params_names, **kwargs)
 
     return summary
 

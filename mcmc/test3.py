@@ -43,7 +43,7 @@ amputate = int(0.3 * nsteps)
 # chi2
 from scipy.optimize import minimize
 nll = lambda *args: -log_probability(*args)
-soln = minimize(nll, params_try, args=(model, x, y))
+soln = minimize(nll, params_try, args=(model, (x, y)))
 m = soln.x
 print('MLS: ', *m)
 
