@@ -52,7 +52,6 @@ line = np.linspace(-10, 10, 100)
 nll = lambda *args: -log_probability(*args, model, (x, y, yerr))
 chi2 = [nll([mu]) for mu in line]
 ax.plot(line, chi2)
-plt.show()
 
 # mcmc 
 mcmc(data=(x, y, yerr), model_params=(model, init, None, None), 

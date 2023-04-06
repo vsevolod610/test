@@ -121,7 +121,7 @@ def pic_fit(chain, model, data, prior_data=None):
     x, y, yerr, *_ = *data, None 
 
     fig, ax = plt.subplots(figsize=(8, 8))
-    last_step = chain[:, -1, :]
+    last_step = chain[-1, :, :]
     func = lambda param: log_probability(param, model, data, prior_data)
     params_chi = max(last_step, key=func)
 
