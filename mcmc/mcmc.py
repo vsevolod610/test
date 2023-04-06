@@ -177,12 +177,12 @@ def mcmc_analyze(chain, data, model, init, prior_data, amputate, params_names,
 
         #fig1 = c.plotter.plot_walks(convolve=100, figsize=(6, 6))
         if save:
-            fig0.savefig(save[0])
-            fig1.savefig(save[1])
-            fig2.savefig(save[2])
+            fig0.savefig(save[0], bbox_inches='tight')
+            fig1.savefig(save[1], bbox_inches='tight')
+            fig2.savefig(save[2], bbox_inches='tight')
 
             # garved collector
-            plt.close()
+            plt.close('all')
             gc.collect()
         if show:
             plt.show()
