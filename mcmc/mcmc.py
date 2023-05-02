@@ -59,7 +59,7 @@ def log_probability(params, model, data, prior_data=None):
     if np.shape(yerr) == (N,):
         sigma2 = yerr ** 2
     if np.shape(yerr) == (N, 2):
-        sigma2 = (m <= y) * yerr[:,0] + (m > y) * yerr[:,1]
+        sigma2 = (m <= y) * yerr[:, 1] + (m > y) * yerr[:, 0]
 
     # lp
     lp_value = -0.5 * np.sum((y - m) ** 2 / sigma2)
@@ -138,7 +138,7 @@ def pic_fit(chain, model, data, prior_data=None):
     if np.shape(yerr) == ():
         ax.plot(x, y, '.k', alpha=0.5, label='data')
     else:
-        ax.errorbar(x, y, yerr.T, label='data', 
+        ax.errorbar(x, y, [yerr[:,1], yerr[:,0]], label='data', 
                     capsize=3.5, mew=1.5, fmt='.k', alpha=0.5)
 
     # plot(best fit)

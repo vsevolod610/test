@@ -22,10 +22,10 @@ ndim = 1
 model = iden
 
 # data
-N = 300
+N = 30
 mu_true = 0
 sigma = 1
-err_mu, err_sigma = 1.0 , 0.5
+err_mu, err_sigma = [1.0, 9.0] , 0.0
 
 x = np.arange(N)
 y = np.random.normal(mu_true, sigma, N)
