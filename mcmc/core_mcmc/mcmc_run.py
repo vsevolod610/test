@@ -8,7 +8,7 @@ import numpy as np
 
 from multiprocessing import Pool
 
-from mcmc_chi2 import log_probability, prior_func
+from .mcmc_chi2 import log_probability, prior_func
 
 
 def mcmc_run(data, model, settings, init, prior_data=None):

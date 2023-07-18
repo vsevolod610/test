@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 from chainconsumer import ChainConsumer
 
 #from mcmc import mcmc, log_probability
-from mcmc_quick import mcmc
-from mcmc_chi2 import log_probability
+from core_mcmc.mcmc_quick import mcmc
+from core_mcmc.mcmc_chi2 import log_probability
 
 
 np.random.seed(123)

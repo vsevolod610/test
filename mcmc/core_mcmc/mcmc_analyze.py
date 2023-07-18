@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from multiprocessing import Pool
 from chainconsumer import ChainConsumer
 
-from mcmc_pic import pic_chain, pic_fit
+from .mcmc_pic import pic_chain, pic_fit
 
 
 def mcmc_analyze(sampler, data, model, init, prior_data, amputate, params_names, 

@@ -14,8 +14,8 @@ import matplotlib.pyplot as plt
 from multiprocessing import Pool
 from chainconsumer import ChainConsumer
 
-from mcmc_run import mcmc_run
-from mcmc_analyze import mcmc_analyze
+from .mcmc_run import mcmc_run
+from .mcmc_analyze import mcmc_analyze
 
 
 def mcmc(data, model_params, settings, **kwargs):

@@ -12,7 +12,7 @@ matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from chainconsumer import ChainConsumer
 
-from mcmc_chi2 import log_probability
+from .mcmc_chi2 import log_probability
 
 
 def pic_chain(sampler, amputate=None, params_names=None):
