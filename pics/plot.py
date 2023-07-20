@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Pic: 
+Pic: plot
 """
 
 import gc
@@ -14,13 +14,15 @@ x = np.linspace(x_min, x_max, 1000)
 
 fig, ax = plt.subplots(figsize=(8, 8))
 
-ax.plot(x, f(x))
 
-#axes
-ax.plot(x, 0*x, 'k')
-ax.plot(0*x, x, 'k', label='line')
-ax.axvline(x=2, color='r')
+# plot
+ax.axhline(y=0, color='k')
+ax.axvline(x=0, color='k')
+ax.plot(x, f(x), label='line')
+ax.fill_between(x, f(1.1 * x) , f(0.9 * x),
+                alpha=0.3, color='b', linewidth=2, linestyle='-')
 
+# settings
 ax.set_xlim(-5, 5)
 ax.set_ylim(-2, 2)
 
