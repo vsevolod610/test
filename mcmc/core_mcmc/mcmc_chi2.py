@@ -28,6 +28,7 @@ def prior_func(params, prior_data=None):
 
 
 def log_probability(params, model, data, prior_data=None):
+    # FIXME: legacy code
     # args managemts: data = (x, y, yerr=None)
     x, y, yerr, *_ = *data, None
 
@@ -43,6 +44,7 @@ def log_probability(params, model, data, prior_data=None):
     const = []
     if type(prior_data) == dict:
         if 'const' in prior_data:
+            # FIXME: order of values not gгuarantee in python < 3.7 
             const = list(prior_data['const'].values())
 
     m = model(*params, *const, x)

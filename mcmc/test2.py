@@ -7,8 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from chainconsumer import ChainConsumer
 
-#from mcmc import mcmc, log_probability
-from core_mcmc.mcmc_quick import mcmc
+from core_mcmc.mcmc_quick import mcmc_quick
 from core_mcmc.mcmc_chi2 import log_probability
 
 
@@ -23,6 +22,7 @@ def iden(p, x):
 ndim = 1
 model = iden
 
+
 # data
 N = 30
 mu_true = 0
@@ -34,6 +34,7 @@ y = np.random.normal(mu_true, sigma, N)
 yerr = err_mu + np.abs(np.random.normal(0.0, err_sigma, (N, 2)))
 #yerr = np.abs(np.random.normal(err_mu, err_sigma, N))
 
+
 # settings
 params_try = [0.1]
 params_sigma = [1.1]
@@ -42,6 +43,7 @@ init = np.array([params_try, params_sigma]).T
 nwalkers = 200
 nsteps = 400
 amputate = int(0.3 * nsteps)
+
 
 # chi2
 from scipy.optimize import minimize
@@ -55,6 +57,22 @@ nll = lambda *args: -log_probability(*args, model, (x, y, yerr))
 chi2 = [nll([mu]) for mu in line]
 ax.plot(line, chi2)
 
+
 # mcmc 
-mcmc(data=(x, y, yerr), model_params=(model, init, None, None), 
-     settings=(nwalkers, nsteps, amputate), prnt=True, show=True, save=False)
+data_params = {
+        'x' : x,
+        'y' : y,
+        'yerr' : yerr
+        }
+model_params = {
+        'model' : model,
+        'init' : init
+        }
+settings_params = {
+        'nwalkers' : nwalkers,
+        'nsteps' : nsteps,
+        'amputate' : amputate
+        }
+
+mcmc_quick(data_params, model_params, settings_params,
+          prnt=True, show=True, save=False)
