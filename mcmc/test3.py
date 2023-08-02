@@ -36,8 +36,8 @@ params_try = [0.9, 1.2]
 params_sigma = [0.5, 1]
 init = np.array([params_try, params_sigma]).T
 
-nwalkers = 300
-nsteps = 600
+nwalkers = 400
+nsteps = 300
 amputate = int(0.3 * nsteps)
 
 

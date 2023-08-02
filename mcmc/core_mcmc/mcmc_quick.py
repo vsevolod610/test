@@ -33,20 +33,23 @@ def mcmc_quick(data_params, model_params, settings_params, **kwargs):
     nwalkers, nsteps, amputate = args_settings(**settings_params)
 
     # kwargs
-    prnt = kwargs['prnt'] if 'prnt' in kwargs else False
-    show = kwargs['show'] if 'show' in kwargs else False
-    save = kwargs['save'] if 'save' in kwargs else False
-    if not save: save = [False, False, False] # if call save=Flase
+    prnt = kwargs.get('prnt', False)
+    show = kwargs.get('show', False)
+    save = kwargs.get('save', False)
+
+    nproc = None # processes limit
 
     # mcmc
-    sampler = mcmc_run(data, model, init, nwalkers, nsteps, prior_data)
+    sampler = mcmc_run(data, model, init, nwalkers, nsteps, prior_data, nproc)
     analyze = mcmc_analyze(sampler, amputate, params_names)
     summary = mcmc_summary(analyze, prnt=prnt)
 
     # pics
-    fig = pic_params(analyze, save_path=save[0])
-    fig = pic_chain(sampler, amputate, params_names, save_path=save[1])
-    fig = pic_fit(sampler, model, data, prior_data, save_path=save[2])
+    if show or save:
+        if not save: save = [False, False, False]
+        fig = pic_params(analyze, path=save[0])
+        fig = pic_chain(sampler, amputate, params_names, path=save[1])
+        fig = pic_fit(sampler, model, data, prior_data, path=save[2])
     if show: plt.show()
 
     # garved collector

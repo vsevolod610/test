@@ -53,7 +53,7 @@ params_sigma = np.array([2, 3, 0.1, 0.1])
 init = np.array([params_try, params_sigma]).T
 
 nwalkers = 400
-nsteps = 200
+nsteps = 300
 amputate = int(0.5 * nsteps)
 
 

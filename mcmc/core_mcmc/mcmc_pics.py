@@ -12,16 +12,16 @@ from chainconsumer import ChainConsumer
 from .mcmc_chi2 import log_probability
 
 
-def pic_params(c, save_path=False):
+def pic_params(c, path=False):
     fig = c.plotter.plot(legend=False, figsize=(6, 6))
 
-    if save_path:
-        fig.savefig(save_path, bbox_inches='tight')
+    if path:
+        fig.savefig(path, bbox_inches='tight')
 
     return fig
 
 
-def pic_chain(sampler, amputate=None, params_names=None, save_path=False):
+def pic_chain(sampler, amputate=None, params_names=None, path=False):
     chain = sampler.get_chain()
     _, _, ndim = np.shape(chain)
 
@@ -43,13 +43,13 @@ def pic_chain(sampler, amputate=None, params_names=None, save_path=False):
             row.set_ylabel(params_names[i], fontsize=12)
         row.set_xlabel(r'steps', fontsize=12)
 
-    if save_path:
-        fig.savefig(save_path, bbox_inches='tight')
+    if path:
+        fig.savefig(path, bbox_inches='tight')
 
     return fig
 
 
-def pic_fit(sampler, model, data, prior_data=None, save_path=False):
+def pic_fit(sampler, model, data, prior_data=None, path=False):
     chain = sampler.get_chain()
     # FIXME: legacy code
     x, y, yerr, *_ = *data, None 
@@ -108,7 +108,7 @@ def pic_fit(sampler, model, data, prior_data=None, save_path=False):
 
     ax.legend(frameon=False)
 
-    if save_path:
-        fig.savefig(save_path, bbox_inches='tight')
+    if path:
+        fig.savefig(path, bbox_inches='tight')
 
     return fig

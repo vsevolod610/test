@@ -12,7 +12,7 @@ from chainconsumer import ChainConsumer
 from .mcmc_chi2 import log_probability, prior_func
 
 
-def mcmc_run(data, model, init, nwalkers, nsteps, prior_data=None):
+def mcmc_run(data, model, init, nwalkers, nsteps, prior_data=None, nproc=None):
     ndim = len(init)
 
     # check init posintion in prior-box
@@ -23,8 +23,7 @@ def mcmc_run(data, model, init, nwalkers, nsteps, prior_data=None):
         pos[k] = param
 
     # mcmc mechanism
-    #with Pool() as pool:
-    with Pool(processes=4) as pool:
+    with Pool(processes=nproc) as pool:
         sampler = emcee.EnsembleSampler(nwalkers, ndim, log_probability, 
                                         args=(model, data, prior_data), 
                                         pool=pool)
