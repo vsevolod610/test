@@ -76,3 +76,4 @@ settings_params = {
 
 mcmc_quick(data_params, model_params, settings_params,
           prnt=True, show=True, save=False)
+

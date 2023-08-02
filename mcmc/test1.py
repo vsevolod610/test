@@ -22,10 +22,18 @@ model = sin_model
 ndim = len(params_names)
 
 prior_data = dict()
-prior_data['box'] = {params_names.index('a'): [2, 8],
-                     params_names.index('b'): [1, 4]}
-prior_data['gauss'] = {params_names.index('b'): [2, 0.1, 0.1]}
-prior_data['const'] = {const_names.index('z'): 1.0}
+prior_data['box'] = {
+        0 : [2, 8], # a
+        1 : [1, 4], # b
+        2 : [-np.inf, np.inf], # c
+        3 : [-np.inf, np.inf] # x0
+        }
+prior_data['gauss'] = {
+        1 : [2, 0.1, 0.1] # b
+        }
+prior_data['const'] = {
+        0: 1.0 # z
+        } 
 
 # FIXME: order of values not gгuarantee in python < 3.7 
 const = list(prior_data['const'].values())
@@ -69,5 +77,3 @@ settings_params = {
 mcmc_quick(data_params, model_params, settings_params, 
            prnt=True, show=True, save=False)
 
-#mcmc(data=(x, y, yerr), model_params=(model, init, prior_data, params_names), 
-#     settings=(nwalkers, nsteps, amputate), prnt=True, show=True, save=False)
