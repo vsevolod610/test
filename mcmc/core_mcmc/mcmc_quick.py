@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-MCMC: quick
+MCMC: quick call mcmc
 """ 
 
 import gc
 import numpy as np
 
-#import matplotlib
-#matplotlib.use('TkAgg')
+import matplotlib
+matplotlib.use('TkAgg')
+#matplotlib.use('Agg')
+
 import matplotlib.pyplot as plt
 
-from .mcmc_run import mcmc_run
-from .mcmc_analyze import mcmc_analyze, mcmc_summary
+from .mcmc_realyze import mcmc_run, mcmc_analyze, mcmc_summary
 from .mcmc_pics import pic_params, pic_chain, pic_fit
 
 

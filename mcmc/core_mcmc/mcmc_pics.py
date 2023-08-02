@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-MCMC: pictures
+MCMC: pictures definition
 """ 
 
 import gc
 import numpy as np
-
-import matplotlib
-matplotlib.use('TkAgg')
 
 import matplotlib.pyplot as plt
 from chainconsumer import ChainConsumer
